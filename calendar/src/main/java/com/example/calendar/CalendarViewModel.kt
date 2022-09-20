@@ -23,7 +23,8 @@ class CalendarViewModel(private val repository: IJobsRepository) : ViewModel() {
     private val _currentYear: MutableStateFlow<Int> = MutableStateFlow(2021)
     val currentYear = _currentYear.asStateFlow()
 
-    private val _currentMonthDays: MutableStateFlow<List<List<String>>> = MutableStateFlow(listOf(listOf("")))
+    private val _currentMonthDays: MutableStateFlow<List<List<String>>> =
+        MutableStateFlow(listOf(listOf("")))
     val currentMonthDays = _currentMonthDays.asStateFlow()
 
     init {
@@ -32,7 +33,7 @@ class CalendarViewModel(private val repository: IJobsRepository) : ViewModel() {
 
     fun initCalendarScreen() {
         getCalendar()
-        getDaysData()
+        getDaysData(currentMonth.value)
     }
 
     fun getJobsData() {
@@ -61,10 +62,10 @@ class CalendarViewModel(private val repository: IJobsRepository) : ViewModel() {
         }
     }
 
-    fun getDaysData() {
+    fun getDaysData(currentMonth: String) {
         viewModelScope.launch {
             _currentMonthDays.emit(listOf(listOf("")))
-            repository.getDaysData().collect {
+            repository.getDaysData(currentMonth).collect {
                 it.doOnError {
 
                 }.doOnSuccess { currentMonthDays ->

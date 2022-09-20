@@ -142,6 +142,7 @@ fun MonthAndYearBar(
                 var currentIndex = months.indexOf(month)
                 if (currentIndex == 0) currentIndex = 11 else currentIndex--
                 viewModel.setMonth(months[currentIndex])
+                viewModel.getDaysData(months[currentIndex])
             },
             modifier = Modifier.size(32.dp),
             shape = CircleShape,
@@ -166,6 +167,7 @@ fun MonthAndYearBar(
                 var currentIndex = months.indexOf(month)
                 if (currentIndex == 11) currentIndex = 0 else currentIndex++
                 viewModel.setMonth(months[currentIndex])
+                viewModel.getDaysData(months[currentIndex])
             },
             modifier = Modifier.size(32.dp),
             shape = CircleShape,
