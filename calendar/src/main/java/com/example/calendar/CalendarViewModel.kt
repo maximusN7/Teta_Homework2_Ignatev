@@ -36,6 +36,12 @@ class CalendarViewModel(private val repository: IJobsRepository) : ViewModel() {
         getDaysData(currentMonth.value)
     }
 
+    fun getCalendarScreen() {
+        _buttonState.value = false
+        getCalendar()
+        //getDaysData(currentMonth.value)
+    }
+
     fun getJobsData() {
         viewModelScope.launch {
             _state.emit(CalendarState.Empty)
@@ -62,10 +68,10 @@ class CalendarViewModel(private val repository: IJobsRepository) : ViewModel() {
         }
     }
 
-    fun getDaysData(currentMonth: String) {
+    fun getDaysData(currentMonth: String, currentMonthDays: List<List<String>> = _currentMonthDays.value) {
         viewModelScope.launch {
             _currentMonthDays.emit(listOf(listOf("")))
-            repository.getDaysData(currentMonth).collect {
+            repository.getDaysData(currentMonth, currentMonthDays).collect {
                 it.doOnError {
 
                 }.doOnSuccess { currentMonthDays ->
@@ -85,5 +91,9 @@ class CalendarViewModel(private val repository: IJobsRepository) : ViewModel() {
 
     fun setYear(currentYear: Int) {
         _currentYear.value = currentYear
+    }
+
+    fun setButtonState(isEnabled: Boolean) {
+        _buttonState.value = isEnabled
     }
 }

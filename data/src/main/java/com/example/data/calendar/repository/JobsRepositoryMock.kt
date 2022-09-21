@@ -1,5 +1,6 @@
 package com.example.data.calendar.repository
 
+import android.provider.CalendarContract
 import com.example.data.calendar.CurrentCalendar
 import com.example.data.calendar.ListItem
 import com.example.data.utils.Result
@@ -75,15 +76,22 @@ class JobsRepositoryMock : IJobsRepository {
         }
     }
 
-    override fun getDaysData(currentMonth: String): Flow<Result<List<List<String>>, Throwable>> {
+    override fun getDaysData(
+        currentMonth: String,
+        previousMonth: List<List<String>>
+    ): Flow<Result<List<List<String>>, Throwable>> {
         return flow {
-            emit(Result.Success(generateMonth(currentMonth)))
+            emit(Result.Success(generateMonth(currentMonth, previousMonth)))
         }
     }
 
-    private fun generateMonth(currentMonth: String): List<List<String>> {
-        val setOfDays = when (currentMonth) {
-            "May" -> listOf(
+
+    private fun generateMonth(
+        currentMonth: String,
+        previousMonth: List<List<String>>
+    ): List<List<String>> {
+        return if (previousMonth.size == 1) {
+            listOf(
                 listOf("", "", "", "", "", "1", "2"),
                 listOf("3", "4", "5", "6", "7", "8", "9"),
                 listOf("10", "11", "12", "13", "14", "15", "16"),
@@ -91,15 +99,37 @@ class JobsRepositoryMock : IJobsRepository {
                 listOf("24", "25", "26", "27", "28", "29", "30"),
                 listOf("31", "", "", "", "", "", "")
             )
-            else -> listOf(
-                listOf("", "1", "2", "3", "4", "5", "6"),
-                listOf("7", "8", "9", "10", "11", "12", "13"),
-                listOf("14", "15", "16", "17", "18", "19", "20"),
-                listOf("21", "22", "23", "24", "25", "26", "27"),
-                listOf("28", "29", "30", "31", "", "", ""),
-                listOf("", "", "", "", "", "", "")
-            )
+        } else {
+            val mask = Array(6) { _ -> Array(7) { _ -> "" } }
+            val setOfDays = when (currentMonth) {
+                "January", "March", "May", "July", "August", "October", "December" -> Array(31) { i -> (i + 1).toString() }
+                "April", "June", "September", "November" -> Array(30) { i -> (i + 1).toString() }
+                else -> Array(28) { i -> (i + 1).toString() }
+            }
+            var step = 0
+            for (a in previousMonth[5]) {
+                if (a == "") step++
+            }
+            if (step == 7) {
+                step = 0
+                for (a in previousMonth[4]) {
+                    if (a == "") step++
+                }
+            }
+            step = if (7 - step != 7) 7 - step else 0
+            val nextMonthArray = List(6) { i ->
+                List(7) { j ->
+                    when {
+                        (i == 0 && j < step) -> mask[i][j]
+                        (setOfDays.size > i * 7 + j - step) -> {
+                            val a = setOfDays[i * 7 + j - step]
+                            a
+                        }
+                        else -> mask[i][j]
+                    }
+                }
+            }
+            nextMonthArray
         }
-        return setOfDays
     }
 }

@@ -30,7 +30,11 @@ fun CalendarScreen(viewModel: CalendarViewModel, resources: ResourceProvider) {
     val currentMonth = viewModel.currentMonth.collectAsState()
     val currentYear = viewModel.currentYear.collectAsState()
     val currentMonthDays = viewModel.currentMonthDays.collectAsState()
-
+    val buttonState = viewModel.buttonState.collectAsState()
+    when (currentDay.value) {
+        "" -> viewModel.setButtonState(false)
+        else -> viewModel.setButtonState(true)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         when (state.value) {
@@ -43,10 +47,7 @@ fun CalendarScreen(viewModel: CalendarViewModel, resources: ResourceProvider) {
                     MonthAndYearBar(currentMonth.value, currentYear.value, resources, viewModel)
                     DaysOfTheWeekTitles(resources)
                     DaysOfTheWeek(currentMonthDays.value, viewModel)
-                    when (currentDay.value) {
-                        "" -> ButtonForJobs(false, resources, viewModel)
-                        else -> ButtonForJobs(true, resources, viewModel)
-                    }
+                    ButtonForJobs(buttonState.value, resources, viewModel)
                 }
             }
             is CalendarState.JobsScreen -> {
@@ -83,7 +84,7 @@ fun CalendarScreen(viewModel: CalendarViewModel, resources: ResourceProvider) {
 
                     }
                 }
-                val onBack = { viewModel.initCalendarScreen() }
+                val onBack = { viewModel.getCalendarScreen() }
                 BackPressHandler(onBackPressed = onBack)
             }
             is CalendarState.Empty -> {
