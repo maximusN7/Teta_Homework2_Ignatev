@@ -8,5 +8,5 @@ import com.example.data.utils.Result
 interface IJobsRepository {
     fun getJobsData(): Flow<Result<List<ListItem>, Throwable>>
     fun getCalendarData(): Flow<Result<CurrentCalendar, Throwable>>
-    fun getDaysData(): Flow<Result<List<List<String>>, Throwable>>
+    fun getDaysData(currentMonth: String, previousMonth: List<List<String>>): Flow<Result<List<List<String>>, Throwable>>
 }
